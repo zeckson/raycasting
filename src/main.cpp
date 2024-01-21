@@ -6,31 +6,31 @@
 const int screenWidth = 800;
 const int screenHeight = 600;
 
-struct Vector2 {
+struct Vector {
     float x, y;
 
-    Vector2() : x(0.0f), y(0.0f) {}
-    Vector2(float _x, float _y) : x(_x), y(_y) {}
+    Vector() : x(0.0f), y(0.0f) {}
+    Vector(float _x, float _y) : x(_x), y(_y) {}
 };
 
 struct Ray {
-    Vector2 origin;
+    Vector origin;
     float angle;
 
-    Ray(const Vector2& _origin, float _angle) : origin(_origin), angle(_angle) {}
+    Ray(const Vector& _origin, float _angle) : origin(_origin), angle(_angle) {}
 };
 
 struct Wall {
-    Vector2 start, end;
+    Vector start, end;
 
-    Wall(const Vector2& _start, const Vector2& _end) : start(_start), end(_end) {}
+    Wall(const Vector& _start, const Vector& _end) : start(_start), end(_end) {}
 };
 
 struct Player {
-    Vector2 position;
+    Vector position;
     float angle;
 
-    Player(const Vector2& _position, float _angle) : position(_position), angle(_angle) {}
+    Player(const Vector& _position, float _angle) : position(_position), angle(_angle) {}
 };
 
 float degreesToRadians(float degrees) {
@@ -49,7 +49,7 @@ float distance(float x1, float y1, float x2, float y2) {
     return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
 
-bool castRay(const Ray& ray, const Wall& wall, Vector2& intersection) {
+bool castRay(const Ray& ray, const Wall& wall, Vector& intersection) {
     float x1 = wall.start.x;
     float y1 = wall.start.y;
     float x2 = wall.end.x;
@@ -89,10 +89,10 @@ void renderScene(SDL_Renderer* renderer, const Player& player, const std::vector
         Ray ray(player.position, rayAngle);
 
         float closestDistance = std::numeric_limits<float>::infinity();
-        Vector2 closestIntersection(0.0f, 0.0f);  // Initialize with default values
+        Vector closestIntersection(0.0f, 0.0f);  // Initialize with default values
 
         for (const Wall& wall : walls) {
-            Vector2 intersection;
+            Vector intersection;
             if (castRay(ray, wall, intersection)) {
                 float dist = distance(player.position.x, player.position.y, intersection.x, intersection.y);
                 if (dist < closestDistance) {
@@ -120,12 +120,12 @@ int main() {
     SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
     // Define the player and walls
-    Player player(Vector2(75, 20), 0.0f);
+    Player player(Vector(75, 20), 0.0f);
     std::vector<Wall> walls = {
-            Wall(Vector2(30, 10), Vector2(30, 30)),
-            Wall(Vector2(30, 30), Vector2(50, 30)),
-            Wall(Vector2(50, 30), Vector2(50, 10)),
-            Wall(Vector2(50, 10), Vector2(30, 10)),
+            Wall(Vector(30, 10), Vector(30, 30)),
+            Wall(Vector(30, 30), Vector(50, 30)),
+            Wall(Vector(50, 30), Vector(50, 10)),
+            Wall(Vector(50, 10), Vector(30, 10)),
     };
 
     bool quit = false;
