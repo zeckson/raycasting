@@ -1,3 +1,9 @@
+# build directory
+build
+
+# clion configs
+.idea
+
 # Prerequisites
 *.d
 
