@@ -5,6 +5,17 @@
 #ifndef RAYCASTING_PLAYER_H
 #define RAYCASTING_PLAYER_H
 
+#define MOVE_SPEED 5.0
+#define ROTATE_SPEED 3.0
+
+#include <SDL_events.h>
+
+struct Intersection {
+    Intersection(int x, int y, double distance) : x(x), y(y), distance(distance) {}
+
+    int x, y;
+    double distance;
+};
 
 class Player {
 private:
@@ -16,7 +27,9 @@ public:
     int getMapX() { return int(posX); }
     int getMapY() { return int(posY); }
 
-    double getRayDistance(double x);
+    Intersection trace(double ray);
+
+    void onKeyDown(const SDL_Keysym &key);
 };
 
 

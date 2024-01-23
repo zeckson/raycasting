@@ -50,7 +50,8 @@ int main() {
             //calculate ray position and direction
             double cameraX = 2 * x / (double) w - 1; //x-coordinate in camera space
 
-            double perpWallDist = player.getRayDistance(cameraX);
+            Intersection intersection = player.trace(cameraX);
+            double perpWallDist = intersection.distance;
 
             //Calculate height of line to draw on screen
             int lineHeight = (int) (h / perpWallDist);
@@ -61,11 +62,12 @@ int main() {
             int drawEnd = lineHeight / 2 + h / 2;
             if (drawEnd >= h) drawEnd = h - 1;
 
-            int mapX = player.getMapX();
-            int mapY = player.getMapY();
+            int mapX = intersection.x;
+            int mapY = intersection.y;
 
             //choose wall color
-            ColorRGB color = colorMap[worldMap[mapX][mapY]];
+            int wallColor = worldMap[mapX][mapY];
+            ColorRGB color = colorMap[wallColor];
 
             //give x and y sides different brightness
 //            if (side == 1) { color = color / 2; }
@@ -81,7 +83,7 @@ int main() {
         //timing for input and FPS counter
         oldTime = time;
         time = SDL_GetTicks();
-        double frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
+        frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
 //        print(1.0 / frameTime); //FPS counter
 //        redraw();
 //        cls();
@@ -107,6 +109,7 @@ int main() {
                 SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
                                "Keydown code: %u", keysym.scancode);
 
+                player.onKeyDown(keysym);
             }
         }
     }

@@ -3,13 +3,62 @@
 //
 
 #include <cmath>
+#include <SDL.h>
 #include "player.h"
 #include "map.h"
 
-double Player::getRayDistance(double cameraX) {
+void Player::onKeyDown(const SDL_Keysym &key) {
+
+    //speed modifiers
+    double moveSpeed = 0.1 * MOVE_SPEED; //the constant value is in squares/second
+    double rotSpeed = 0.1 * ROTATE_SPEED; //the constant value is in radians/second
+
+    double move = 0;
+    double rotate = 0;
+    switch (key.scancode) {
+        case SDL_SCANCODE_UP:
+            move = +1;
+            break;
+        case SDL_SCANCODE_DOWN:
+            move = -1;
+            break;
+        case SDL_SCANCODE_LEFT:
+            rotate = rotSpeed;
+            break;
+        case SDL_SCANCODE_RIGHT:
+            rotate = -rotSpeed;
+            break;
+        default:
+            // do nothing
+            break;
+    }
+
+    if (move != 0.0) {
+        double deltaX = dirX * moveSpeed;
+        double deltaY = dirY * moveSpeed;
+        if(worldMap[int(posX + deltaX)][int(posY)] == false) posX += deltaX;
+        if(worldMap[int(posX)][int(posY + deltaY)] == false) posY += deltaY;
+
+        SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
+                       "Move to: (%f, %f)", posX, posY);
+    }
+
+    if (rotate != 0) {
+        //both camera direction and camera plane must be rotated
+        double oldDirX = dirX;
+        dirX = dirX * cos(rotate) - dirY * sin(rotate);
+        dirY = oldDirX * sin(rotate) + dirY * cos(rotate);
+        double oldPlaneX = planeX;
+        planeX = planeX * cos(rotate) - planeY * sin(rotate);
+        planeY = oldPlaneX * sin(rotate) + planeY * cos(rotSpeed);
+    }
+
+}
+
+Intersection Player::trace(double ray) {
     //calculate ray position and direction
-    double rayDirX = dirX + planeX * cameraX;
-    double rayDirY = dirY + planeY * cameraX;
+    double rayDirX = dirX + planeX * ray;
+    double rayDirY = dirY + planeY * ray;
     //which box of the map we're in
     int mapX = int(posX);
     int mapY = int(posY);
@@ -79,5 +128,5 @@ double Player::getRayDistance(double cameraX) {
     if (side == 0) perpWallDist = (sideDistX - deltaDistX);
     else perpWallDist = (sideDistY - deltaDistY);
 
-    return perpWallDist;
+    return {mapX, mapY, perpWallDist};
 }
