@@ -2,143 +2,190 @@
 #include <cmath>
 #include <vector>
 #include <SDL.h>
+#include "map.h"
 
 const int screenWidth = 800;
 const int screenHeight = 600;
 
-struct Vector {
-    float x, y;
-
-    Vector() : x(0.0f), y(0.0f) {}
-    Vector(float _x, float _y) : x(_x), y(_y) {}
+enum class ColorRGB {
+    RED,
+    GREEN,
+    BLUE,
+    WHITE,
+    YELLOW
 };
 
-struct Ray {
-    Vector origin;
-    float angle;
-
-    Ray(const Vector& _origin, float _angle) : origin(_origin), angle(_angle) {}
-};
-
-struct Wall {
-    Vector start, end;
-
-    Wall(const Vector& _start, const Vector& _end) : start(_start), end(_end) {}
-};
-
-struct Player {
-    Vector position;
-    float angle;
-
-    Player(const Vector& _position, float _angle) : position(_position), angle(_angle) {}
-};
-
-float degreesToRadians(float degrees) {
-    return degrees * M_PI / 180.0f;
-}
-
-float normalizeAngle(float angle) {
-    angle = fmod(angle, 360.0f);
-    if (angle < 0.0f) {
-        angle += 360.0f;
-    }
-    return angle;
-}
-
-float distance(float x1, float y1, float x2, float y2) {
-    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-}
-
-bool castRay(const Ray& ray, const Wall& wall, Vector& intersection) {
-    float x1 = wall.start.x;
-    float y1 = wall.start.y;
-    float x2 = wall.end.x;
-    float y2 = wall.end.y;
-
-    float x3 = ray.origin.x;
-    float y3 = ray.origin.y;
-    float x4 = ray.origin.x + cos(degreesToRadians(ray.angle));
-    float y4 = ray.origin.y + sin(degreesToRadians(ray.angle));
-
-    float denominator = (x1 - x2) * (y3 - y4) - (x3 - x4) * (y1 - y2);
-
-    if (denominator == 0) {
-        return false;
-    }
-
-    float t = ((x1 - x3) * (y3 - y4) - (x3 - x4) * (y1 - y3)) / denominator;
-    float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denominator;
-
-    if (t > 0 && t < 1 && u > 0) {
-        intersection.x = x1 + t * (x2 - x1);
-        intersection.y = y1 + t * (y2 - y1);
-        return true;
-    }
-
-    return false;
-}
-
-void renderScene(SDL_Renderer* renderer, const Player& player, const std::vector<Wall>& walls) {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
-
-    for (int x = 0; x < screenWidth; ++x) {
-        float rayAngle = player.angle - 30.0f + x * (60.0f / screenWidth);
-        rayAngle = normalizeAngle(rayAngle);
-
-        Ray ray(player.position, rayAngle);
-
-        float closestDistance = std::numeric_limits<float>::infinity();
-        Vector closestIntersection(0.0f, 0.0f);  // Initialize with default values
-
-        for (const Wall& wall : walls) {
-            Vector intersection;
-            if (castRay(ray, wall, intersection)) {
-                float dist = distance(player.position.x, player.position.y, intersection.x, intersection.y);
-                if (dist < closestDistance) {
-                    closestDistance = dist;
-                    closestIntersection = intersection;
-                }
-            }
-        }
-
-        int lineHeight = static_cast<int>(screenHeight / closestDistance);
-
-        // Draw the column
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-        SDL_RenderDrawLine(renderer, x, (screenHeight - lineHeight) / 2, x, (screenHeight + lineHeight) / 2);
-    }
-
-    SDL_RenderPresent(renderer);
-}
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
 
-    SDL_Window* window = SDL_CreateWindow("Raycasting Example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+    SDL_Window *window = SDL_CreateWindow("Raycasting Example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                           screenWidth, screenHeight, SDL_WINDOW_SHOWN);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    // Define the player and walls
-    Player player(Vector(75, 20), 0.0f);
-    std::vector<Wall> walls = {
-            Wall(Vector(30, 10), Vector(30, 30)),
-            Wall(Vector(30, 30), Vector(50, 30)),
-            Wall(Vector(50, 30), Vector(50, 10)),
-            Wall(Vector(50, 10), Vector(30, 10)),
-    };
+    double posX = 22, posY = 12;  //x and y start position
+    double dirX = -1, dirY = 0; //initial direction vector
+    double planeX = 0, planeY = 0.66; //the 2d raycaster version of camera plane
+
+    double time = 0; //time of current frame
+    double oldTime = 0; //time of previous frame
+
+    int w = screenWidth;
+    int h = screenHeight;
 
     bool quit = false;
     SDL_Event e;
 
     while (!quit) {
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+
+        for (int x = 0; x < w; x++) {
+            //calculate ray position and direction
+            double cameraX = 2 * x / (double) w - 1; //x-coordinate in camera space
+            double rayDirX = dirX + planeX * cameraX;
+            double rayDirY = dirY + planeY * cameraX;
+            //which box of the map we're in
+            int mapX = int(posX);
+            int mapY = int(posY);
+
+            //length of ray from current position to next x or y-side
+            double sideDistX;
+            double sideDistY;
+
+            //length of ray from one x or y-side to next x or y-side
+            //these are derived as:
+            //deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX))
+            //deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY))
+            //which can be simplified to abs(|rayDir| / rayDirX) and abs(|rayDir| / rayDirY)
+            //where |rayDir| is the length of the vector (rayDirX, rayDirY). Its length,
+            //unlike (dirX, dirY) is not 1, however this does not matter, only the
+            //ratio between deltaDistX and deltaDistY matters, due to the way the DDA
+            //stepping further below works. So the values can be computed as below.
+            // Division through zero is prevented, even though technically that's not
+            // needed in C++ with IEEE 754 floating point values.
+            double deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
+            double deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1 / rayDirY);
+
+            double perpWallDist;
+
+            //what direction to step in x or y-direction (either +1 or -1)
+            int stepX;
+            int stepY;
+
+            int hit = 0; //was there a wall hit?
+            int side; //was a NS or a EW wall hit?
+            //calculate step and initial sideDist
+            if (rayDirX < 0) {
+                stepX = -1;
+                sideDistX = (posX - mapX) * deltaDistX;
+            } else {
+                stepX = 1;
+                sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+            }
+            if (rayDirY < 0) {
+                stepY = -1;
+                sideDistY = (posY - mapY) * deltaDistY;
+            } else {
+                stepY = 1;
+                sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+            }
+            //perform DDA
+            while (hit == 0) {
+                //jump to next map square, either in x-direction, or in y-direction
+                if (sideDistX < sideDistY) {
+                    sideDistX += deltaDistX;
+                    mapX += stepX;
+                    side = 0;
+                } else {
+                    sideDistY += deltaDistY;
+                    mapY += stepY;
+                    side = 1;
+                }
+                //Check if ray has hit a wall
+                if (worldMap[mapX][mapY] > 0) hit = 1;
+            }
+            //Calculate distance projected on camera direction. This is the shortest distance from the point where the wall is
+            //hit to the camera plane. Euclidean to center camera point would give fisheye effect!
+            //This can be computed as (mapX - posX + (1 - stepX) / 2) / rayDirX for side == 0, or same formula with Y
+            //for size == 1, but can be simplified to the code below thanks to how sideDist and deltaDist are computed:
+            //because they were left scaled to |rayDir|. sideDist is the entire length of the ray above after the multiple
+            //steps, but we subtract deltaDist once because one step more into the wall was taken above.
+            if (side == 0) perpWallDist = (sideDistX - deltaDistX);
+            else perpWallDist = (sideDistY - deltaDistY);
+
+            //Calculate height of line to draw on screen
+            int lineHeight = (int) (h / perpWallDist);
+
+            //calculate lowest and highest pixel to fill in current stripe
+            int drawStart = -lineHeight / 2 + h / 2;
+            if (drawStart < 0) drawStart = 0;
+            int drawEnd = lineHeight / 2 + h / 2;
+            if (drawEnd >= h) drawEnd = h - 1;
+
+            //choose wall color
+            ColorRGB color;
+            switch (worldMap[mapX][mapY]) {
+                case 1:
+                    color = ColorRGB::RED;
+                    break; //red
+                case 2:
+                    color = ColorRGB::GREEN;
+                    break; //green
+                case 3:
+                    color = ColorRGB::BLUE;
+                    break; //blue
+                case 4:
+                    color = ColorRGB::WHITE;
+                    break; //white
+                default:
+                    color = ColorRGB::YELLOW;
+                    break; //yellow
+            }
+
+            //give x and y sides different brightness
+//            if (side == 1) { color = color / 2; }
+
+
+            // Draw the column
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+            SDL_RenderDrawLine(renderer, x, drawStart, x,
+                               drawEnd);//draw the pixels of the stripe as a vertical line
+
+        }
+
+        //timing for input and FPS counter
+        oldTime = time;
+        time = SDL_GetTicks();
+        double frameTime = (time - oldTime) / 1000.0; //frameTime is the time this frame has taken, in seconds
+//        print(1.0 / frameTime); //FPS counter
+//        redraw();
+//        cls();
+
+        SDL_RenderPresent(renderer);
+
+
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 quit = true;
             }
-        }
 
-        renderScene(renderer, player, walls);
+            if (e.type == SDL_KEYDOWN) {
+
+                // Show menu on escape
+                if (e.key.keysym.scancode == SDL_SCANCODE_ESCAPE) {
+                    quit = true;
+                }
+
+                const SDL_Keysym &keysym = e.key.keysym;
+
+
+                SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
+                               "Keydown code: %u", keysym.scancode);
+
+            }
+        }
     }
 
     SDL_DestroyRenderer(renderer);
