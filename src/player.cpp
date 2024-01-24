@@ -17,10 +17,10 @@ void Player::onKeyDown(const SDL_Keysym &key) {
     double rotate = 0;
     switch (key.scancode) {
         case SDL_SCANCODE_UP:
-            move = +1;
+            move = moveSpeed;
             break;
         case SDL_SCANCODE_DOWN:
-            move = -1;
+            move = -moveSpeed;
             break;
         case SDL_SCANCODE_LEFT:
             rotate = rotSpeed;
@@ -33,9 +33,9 @@ void Player::onKeyDown(const SDL_Keysym &key) {
             break;
     }
 
-    if (move != 0.0) {
-        double deltaX = dirX * moveSpeed;
-        double deltaY = dirY * moveSpeed;
+    if (move != 0) {
+        double deltaX = dirX * move;
+        double deltaY = dirY * move;
         if(worldMap[int(posX + deltaX)][int(posY)] == false) posX += deltaX;
         if(worldMap[int(posX)][int(posY + deltaY)] == false) posY += deltaY;
 
