@@ -10,11 +10,18 @@
 
 #include <SDL_events.h>
 
+enum class CellSide {
+    EAST_WEST = 0,
+    NORTH_SOUTH = 1,
+    UNKNOWN = 99
+};
+
 struct Intersection {
-    Intersection(int x, int y, double distance) : x(x), y(y), distance(distance) {}
+    Intersection(int x, int y, double distance, CellSide side) : x(x), y(y), distance(distance), side(side) {}
 
     int x, y;
     double distance;
+    CellSide side;
 };
 
 class Player {

@@ -10,7 +10,12 @@ struct ColorRGB {
     int r, g, b, a;
 
     ColorRGB(int r, int g, int b, int a) : r(r), g(g), b(b), a(a) {}
+
     ColorRGB(int r, int g, int b) : ColorRGB(r, g, b, 255) {}
+
+    ColorRGB operator/(int value) {
+        return {r / value, g / value, b / value, a / value};
+    }
 };
 
 static const ColorRGB GREEN(0, 255, 0);
@@ -70,7 +75,7 @@ int main() {
             ColorRGB color = colorMap[wallColor];
 
             //give x and y sides different brightness
-//            if (side == 1) { color = color / 2; }
+            if (intersection.side == CellSide::NORTH_SOUTH) { color = color / 2; }
 
 
             // Draw the column

@@ -88,7 +88,6 @@ Intersection Player::trace(double ray) {
     int stepY;
 
     int hit = 0; //was there a wall hit?
-    int side; //was a NS or a EW wall hit?
     //calculate step and initial sideDist
     if (rayDirX < 0) {
         stepX = -1;
@@ -104,17 +103,19 @@ Intersection Player::trace(double ray) {
         stepY = 1;
         sideDistY = (mapY + 1.0 - posY) * deltaDistY;
     }
+
     //perform DDA
+    CellSide side = CellSide::UNKNOWN; //was a NS or a EW wall hit?
     while (hit == 0) {
         //jump to next map square, either in x-direction, or in y-direction
         if (sideDistX < sideDistY) {
             sideDistX += deltaDistX;
             mapX += stepX;
-            side = 0;
+            side = CellSide::EAST_WEST;
         } else {
             sideDistY += deltaDistY;
             mapY += stepY;
-            side = 1;
+            side = CellSide::NORTH_SOUTH;
         }
         //Check if ray has hit a wall
         if (worldMap[mapX][mapY] > 0) hit = 1;
@@ -125,8 +126,8 @@ Intersection Player::trace(double ray) {
     //for size == 1, but can be simplified to the code below thanks to how sideDist and deltaDist are computed:
     //because they were left scaled to |rayDir|. sideDist is the entire length of the ray above after the multiple
     //steps, but we subtract deltaDist once because one step more into the wall was taken above.
-    if (side == 0) perpWallDist = (sideDistX - deltaDistX);
+    if (side == CellSide::EAST_WEST) perpWallDist = (sideDistX - deltaDistX);
     else perpWallDist = (sideDistY - deltaDistY);
 
-    return {mapX, mapY, perpWallDist};
+    return {mapX, mapY, perpWallDist, side};
 }
