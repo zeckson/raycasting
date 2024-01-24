@@ -1,32 +1,10 @@
-#include <cmath>
 #include <SDL.h>
 #include "map.h"
+#include "color.h"
 #include "player.h"
 
 const int screenWidth = 800;
 const int screenHeight = 600;
-
-struct ColorRGB {
-    int r, g, b, a;
-
-    ColorRGB(int r, int g, int b, int a) : r(r), g(g), b(b), a(a) {}
-
-    ColorRGB(int r, int g, int b) : ColorRGB(r, g, b, 255) {}
-
-    ColorRGB operator/(int value) {
-        return {r / value, g / value, b / value, a / value};
-    }
-};
-
-static const ColorRGB GREEN(0, 255, 0);
-static const ColorRGB RED(255, 0, 0);
-static const ColorRGB BLUE(0, 0, 255);
-static const ColorRGB WHITE(255, 255, 255);
-static const ColorRGB YELLOW(255, 255, 0);
-
-static const ColorRGB colorMap[] = {
-        WHITE, YELLOW, RED, GREEN, BLUE
-};
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
