@@ -10,35 +10,19 @@
 
 #include <SDL_events.h>
 
-enum class CellSide {
-    EAST = 0,
-    WEST,
-    NORTH,
-    SOUTH,
-    UNKNOWN = 99
-};
-
-struct Intersection {
-    Intersection(int x, int y, double distance, CellSide side) : x(x), y(y), distance(distance), side(side) {}
-
-    int x, y;
-    double distance;
-    CellSide side;
-};
-
 class Player {
-private:
-    double posX = 22, posY = 12;  //x and y start position
-    double dirX = -1, dirY = 0; //initial direction vector
-    double planeX = 0, planeY = 0.66; //the 2d raycaster version of camera plane
-
 public:
-    int getMapX() { return int(posX); }
-    int getMapY() { return int(posY); }
-
-    Intersection trace(double ray) const;
-
     void onKeyDown(const SDL_Keysym &key);
+
+    //x and y start position
+    double posX = 22;
+    double posY = 12;
+    //initial direction vector
+    double dirX = -1;
+    double dirY = 0;
+    //the 2d raycaster version of camera plane
+    double planeX = 0;
+    double planeY = 0.66;
 };
 
 
