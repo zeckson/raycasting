@@ -30,4 +30,8 @@ static const ColorRGB colorMap[] = {
         WHITE, YELLOW, RED, GREEN, BLUE
 };
 
+inline void SDL_SetRenderColorRGB(SDL_Renderer *renderer, const ColorRGB &color) {
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+}
+
 #endif //RAYCASTING_COLOR_H

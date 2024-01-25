@@ -4,6 +4,7 @@
 #include "color.h"
 #include "player.h"
 #include "engine.h"
+#include "minimap.h"
 
 const int screenWidth = 800;
 const int screenHeight = 600;
@@ -17,6 +18,7 @@ int main() {
 
     Player player;
     Engine engine(player, screenWidth, screenHeight);
+    Minimap minimap(player, screenWidth, screenHeight);
 
     double time = 0; //time of current frame
     double oldTime = 0; //time of previous frame
@@ -29,7 +31,7 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        engine.render(renderer);
+        minimap.render(renderer);
 
         SDL_RenderPresent(renderer);
 

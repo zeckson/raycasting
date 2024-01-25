@@ -26,8 +26,7 @@ void Engine::render(SDL_Renderer *renderer) {
         int mapY = intersection.y;
 
         //choose wall color
-        int wallColor = worldMap[mapX][mapY];
-        ColorRGB color = colorMap[wallColor];
+        ColorRGB color = colorMap[worldMap[mapX][mapY]];
 
         //give x and y sides different brightness
         if (intersection.side == CellSide::NORTH || intersection.side == CellSide::SOUTH) {
@@ -38,8 +37,8 @@ void Engine::render(SDL_Renderer *renderer) {
         double distanceShade = 1.0 - std::fmin(intersection.distance / 24.0, 1.0);
         color = color * distanceShade;
 
+        SDL_SetRenderColorRGB(renderer, color);
         // Draw the column
-        SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
         //draw the pixels of the stripe as a vertical line
         SDL_RenderDrawLine(renderer, x, drawStart, x, drawEnd);
     }
