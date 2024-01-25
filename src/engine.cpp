@@ -49,8 +49,8 @@ Intersection Engine::trace(double x) {
     double cameraX = 2 * x / (double) width - 1; //x-coordinate in camera space
 
     //calculate ray position and direction
-    double rayDirX = player.dirX + player.planeX * cameraX;
-    double rayDirY = player.dirY + player.planeY * cameraX;
+    double rayDirX = player.getRayDirX(cameraX);
+    double rayDirY = player.getRayDirY(cameraX);
     //which box of the map we're in
     int mapX = int(player.posX);
     int mapY = int(player.posY);

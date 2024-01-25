@@ -14,6 +14,9 @@ class Player {
 public:
     void onKeyDown(const SDL_Keysym &key);
 
+    [[nodiscard]] double getRayDirX(const double cameraX) const { return dirX + planeX * cameraX; };
+    [[nodiscard]] double getRayDirY(const double cameraX) const { return dirY + planeY * cameraX; };
+
     //x and y start position
     double posX = 22;
     double posY = 12;

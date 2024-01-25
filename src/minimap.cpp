@@ -39,13 +39,31 @@ int Minimap::translateX(int x) const { return x * size; }
 int Minimap::translateX(double x) const { return int(x * size); }
 
 void Minimap::drawPlayer(SDL_Renderer *pRenderer) const {
+    // Render player
     SDL_SetRenderColorRGB(pRenderer, WHITE);
     int playerX = translateX(player.posX);
     int playerY = translateY(player.posY);
     drawCircle(pRenderer, playerX, playerY, size / 2);
+
+    // Render direction arrow
     SDL_SetRenderColorRGB(pRenderer, BLUE);
     int directionX = translateX(player.posX + player.dirX);
     int directionY = translateY(player.posY + player.dirY);
+    SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
+
+    // Render plane
+    //calculate ray position and direction
+    SDL_SetRenderColorRGB(pRenderer, GREEN);
+    double rayDirX = player.getRayDirX(0);
+    double rayDirY = player.getRayDirY(0);
+    directionX = translateX(player.posX + rayDirX);
+    directionY = translateY(player.posY + rayDirY);
+    SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
+
+    rayDirX = player.getRayDirX(2 * width / (double) width - 1);
+    rayDirY = player.getRayDirY(2 * width / (double) width - 1);
+    directionX = translateX(player.posX + rayDirX);
+    directionY = translateY(player.posY + rayDirY);
     SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
 }
 
