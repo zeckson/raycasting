@@ -31,18 +31,21 @@ void Minimap::render(SDL_Renderer *pRenderer) {
 }
 
 int Minimap::translateY(int y) const { return y * size; }
-int Minimap::translateY(double y) const { return y * size; }
+
+int Minimap::translateY(double y) const { return int(y * size); }
 
 int Minimap::translateX(int x) const { return x * size; }
-int Minimap::translateX(double x) const { return x * size; }
+
+int Minimap::translateX(double x) const { return int(x * size); }
 
 void Minimap::drawPlayer(SDL_Renderer *pRenderer) const {
+    SDL_SetRenderColorRGB(pRenderer, WHITE);
     int playerX = translateX(player.posX);
     int playerY = translateY(player.posY);
     drawCircle(pRenderer, playerX, playerY, size / 2);
     SDL_SetRenderColorRGB(pRenderer, BLUE);
-    int directionX = int(playerX + translateX(player.dirX));
-    int directionY = int(playerY + translateY(player.dirY));
+    int directionX = translateX(player.posX + player.dirX);
+    int directionY = translateY(player.posY + player.dirY);
     SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
 }
 
