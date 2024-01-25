@@ -13,8 +13,8 @@ void Minimap::render(SDL_Renderer *pRenderer) {
     for (int x = 0; x < mapWidth; ++x) {
         for (int y = 0; y < mapHeight; ++y) {
             SDL_SetRenderColorRGB(pRenderer, WHITE);
-            int displayX = x * size;
-            int displayY = y * size;
+            int displayX = translateX(x);
+            int displayY = translateY(y);
             rect = {displayX, displayY, size, size};
             SDL_RenderDrawRect(pRenderer, &rect);
 
@@ -30,11 +30,20 @@ void Minimap::render(SDL_Renderer *pRenderer) {
     drawPlayer(pRenderer);
 }
 
-void Minimap::drawPlayer(SDL_Renderer *pRenderer) const {
-    int playerX = int(player.posX * size);
-    int playerY = int(player.posY * size);
-    drawCircle(pRenderer, playerX, playerY, size / 2);
+int Minimap::translateY(int y) const { return y * size; }
+int Minimap::translateY(double y) const { return y * size; }
 
+int Minimap::translateX(int x) const { return x * size; }
+int Minimap::translateX(double x) const { return x * size; }
+
+void Minimap::drawPlayer(SDL_Renderer *pRenderer) const {
+    int playerX = translateX(player.posX);
+    int playerY = translateY(player.posY);
+    drawCircle(pRenderer, playerX, playerY, size / 2);
+    SDL_SetRenderColorRGB(pRenderer, BLUE);
+    int directionX = int(playerX + translateX(player.dirX));
+    int directionY = int(playerY + translateY(player.dirY));
+    SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
 }
 
 void Minimap::drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) {
@@ -46,3 +55,4 @@ void Minimap::drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int 
         }
     }
 }
+

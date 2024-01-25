@@ -24,6 +24,12 @@ private:
     static void drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) ;
 
     void drawPlayer(SDL_Renderer *pRenderer) const;
+
+    [[nodiscard]] int translateX(int x) const;
+    [[nodiscard]] int translateX(double x) const;
+
+    [[nodiscard]] int translateY(int y) const;
+    [[nodiscard]] int translateY(double y) const;
 };
 
 
