@@ -22,10 +22,8 @@ void Minimap::render(SDL_Renderer *pRenderer) {
             if (wall) {
                 ColorRGB color = colorMap[wall];
                 SDL_SetRenderColorRGB(pRenderer, color);
-                for (int i = 0; i < size; ++i) {
-                    rect = {displayX, displayY, size, size};
-                    SDL_RenderDrawRect(pRenderer, &rect);
-                }
+                rect = {displayX, displayY, size, size};
+                SDL_RenderDrawRect(pRenderer, &rect);
             }
         }
     }
