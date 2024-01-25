@@ -10,10 +10,7 @@
 
 void Engine::render(SDL_Renderer *renderer) {
     for (int x = 0; x < width; x++) {
-        //calculate ray position and direction
-        double cameraX = 2 * x / (double) width - 1; //x-coordinate in camera space
-
-        Intersection intersection = trace(cameraX);
+        Intersection intersection = trace(x);
         double perpWallDist = intersection.distance;
 
         //Calculate height of line to draw on screen
@@ -50,8 +47,11 @@ void Engine::render(SDL_Renderer *renderer) {
 
 Intersection Engine::trace(double x) {
     //calculate ray position and direction
-    double rayDirX = player.dirX + player.planeX * x;
-    double rayDirY = player.dirY + player.planeY * x;
+    double cameraX = 2 * x / (double) width - 1; //x-coordinate in camera space
+
+    //calculate ray position and direction
+    double rayDirX = player.dirX + player.planeX * cameraX;
+    double rayDirY = player.dirY + player.planeY * cameraX;
     //which box of the map we're in
     int mapX = int(player.posX);
     int mapY = int(player.posY);

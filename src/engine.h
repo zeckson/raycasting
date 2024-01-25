@@ -29,16 +29,15 @@ class Engine {
 private:
     const TextureMap textureMap;
 
+    const Player& player;
     const uint16_t width, height;
 
-    Intersection trace(double x);
+    Intersection trace(double cameraX);
 
 public:
-    explicit Engine(uint16_t width, uint16_t height) : width(width), height(height) {};
+    explicit Engine(const Player& player, uint16_t width, uint16_t height) : player(player), width(width), height(height) {};
 
     void render(SDL_Renderer *renderer);
-
-    Player player;
 };
 
 

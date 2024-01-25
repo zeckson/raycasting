@@ -15,7 +15,8 @@ int main() {
                                           screenWidth, screenHeight, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    Engine engine(screenWidth, screenHeight);
+    Player player;
+    Engine engine(player, screenWidth, screenHeight);
 
     double time = 0; //time of current frame
     double oldTime = 0; //time of previous frame
@@ -59,7 +60,7 @@ int main() {
                 SDL_LogMessage(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_INFO,
                                "Keydown code: %u", keysym.scancode);
 
-                engine.player.onKeyDown(keysym);
+                player.onKeyDown(keysym);
             }
         }
     }
