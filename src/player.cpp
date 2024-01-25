@@ -55,7 +55,7 @@ void Player::onKeyDown(const SDL_Keysym &key) {
 
 }
 
-Intersection Player::trace(double ray) {
+Intersection Player::trace(double ray) const {
     //calculate ray position and direction
     double rayDirX = dirX + planeX * ray;
     double rayDirY = dirY + planeY * ray;
@@ -80,8 +80,6 @@ Intersection Player::trace(double ray) {
     // needed in C++ with IEEE 754 floating point values.
     double deltaDistX = (rayDirX == 0) ? 1e30 : std::abs(1 / rayDirX);
     double deltaDistY = (rayDirY == 0) ? 1e30 : std::abs(1 / rayDirY);
-
-    double perpWallDist;
 
     //what direction to step in x or y-direction (either +1 or -1)
     int stepX;
@@ -111,22 +109,24 @@ Intersection Player::trace(double ray) {
         if (sideDistX < sideDistY) {
             sideDistX += deltaDistX;
             mapX += stepX;
-            side = CellSide::EAST_WEST;
+            side = stepX < 0 ? CellSide::EAST : CellSide::WEST;
         } else {
             sideDistY += deltaDistY;
             mapY += stepY;
-            side = CellSide::NORTH_SOUTH;
+            side = stepY < 0 ? CellSide::NORTH : CellSide::SOUTH;
         }
         //Check if ray has hit a wall
         if (worldMap[mapX][mapY] > 0) hit = 1;
     }
+
+    double perpWallDist;
     //Calculate distance projected on camera direction. This is the shortest distance from the point where the wall is
     //hit to the camera plane. Euclidean to center camera point would give fisheye effect!
     //This can be computed as (mapX - posX + (1 - stepX) / 2) / rayDirX for side == 0, or same formula with Y
     //for size == 1, but can be simplified to the code below thanks to how sideDist and deltaDist are computed:
     //because they were left scaled to |rayDir|. sideDist is the entire length of the ray above after the multiple
     //steps, but we subtract deltaDist once because one step more into the wall was taken above.
-    if (side == CellSide::EAST_WEST) perpWallDist = (sideDistX - deltaDistX);
+    if (side == CellSide::EAST || side == CellSide::WEST) perpWallDist = (sideDistX - deltaDistX);
     else perpWallDist = (sideDistY - deltaDistY);
 
     return {mapX, mapY, perpWallDist, side};

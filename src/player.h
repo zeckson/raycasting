@@ -11,8 +11,10 @@
 #include <SDL_events.h>
 
 enum class CellSide {
-    EAST_WEST = 0,
-    NORTH_SOUTH = 1,
+    EAST = 0,
+    WEST,
+    NORTH,
+    SOUTH,
     UNKNOWN = 99
 };
 
@@ -34,7 +36,7 @@ public:
     int getMapX() { return int(posX); }
     int getMapY() { return int(posY); }
 
-    Intersection trace(double ray);
+    Intersection trace(double ray) const;
 
     void onKeyDown(const SDL_Keysym &key);
 };

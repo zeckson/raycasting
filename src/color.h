@@ -6,14 +6,17 @@
 #define RAYCASTING_COLOR_H
 
 struct ColorRGB {
-    int r, g, b, a;
+    u_int8_t r, g, b, a;
 
     ColorRGB(int r, int g, int b, int a) : r(r), g(g), b(b), a(a) {}
 
     ColorRGB(int r, int g, int b) : ColorRGB(r, g, b, 255) {}
 
-    ColorRGB operator/(int value) {
-        return {r / value, g / value, b / value, a / value};
+    ColorRGB operator/(const int value) {
+        return {u_int8_t(r / value), u_int8_t(g / value), u_int8_t(b / value), u_int8_t(a / value)};
+    }
+    ColorRGB operator*(const double value) {
+        return {u_int8_t(r * value), u_int8_t(g * value), u_int8_t(b * value), u_int8_t(a * value)};
     }
 };
 

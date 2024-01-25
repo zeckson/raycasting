@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <algorithm>
 #include "map.h"
 #include "color.h"
 #include "player.h"
@@ -53,8 +54,13 @@ int main() {
             ColorRGB color = colorMap[wallColor];
 
             //give x and y sides different brightness
-            if (intersection.side == CellSide::NORTH_SOUTH) { color = color / 2; }
+            if (intersection.side == CellSide::NORTH || intersection.side == CellSide::SOUTH) {
+                color = color / 2;
+            }
 
+            // ...shade by distance...
+            double distanceShade = 1.0 - std::min(intersection.distance / 24.0, 1.0);
+            color = color * distanceShade;
 
             // Draw the column
             SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
