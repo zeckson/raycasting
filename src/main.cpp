@@ -31,6 +31,7 @@ int main() {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
+        engine.render(renderer);
         minimap.render(renderer);
 
         SDL_RenderPresent(renderer);

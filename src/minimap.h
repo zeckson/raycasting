@@ -21,7 +21,9 @@ private:
     const Player& player;
     int width, height, size = GRID_SIZE;
 
-    void drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) const;
+    static void drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) ;
+
+    void drawPlayer(SDL_Renderer *pRenderer) const;
 };
 
 
