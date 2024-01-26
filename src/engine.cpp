@@ -51,9 +51,6 @@ Intersection Engine::trace(double x) {
     //calculate ray position and direction
     double rayDirX = player.getRayDirX(cameraX);
     double rayDirY = player.getRayDirY(cameraX);
-    //which box of the map we're in
-    int mapX = int(player.posX);
-    int mapY = int(player.posY);
 
     //length of ray from current position to next x or y-side
     double sideDistX;
@@ -73,12 +70,15 @@ Intersection Engine::trace(double x) {
     double deltaDistX = (rayDirX == 0) ? 1e30 : abs(1 / rayDirX);
     double deltaDistY = (rayDirY == 0) ? 1e30 : abs(1 / rayDirY);
 
+    //which box of the map we're in
+    int mapX = int(player.posX);
+    int mapY = int(player.posY);
+
     //what direction to step in x or y-direction (either +1 or -1)
     int stepX;
     int stepY;
 
-    int hit = 0; //was there a wall hit?
-//calculate step and initial sideDist
+    //calculate step and initial sideDist
     if (rayDirX < 0) {
         stepX = -1;
         sideDistX = (player.posX - mapX) * deltaDistX;
@@ -95,6 +95,7 @@ Intersection Engine::trace(double x) {
     }
 
     //perform DDA
+    int hit = 0; //was there a wall hit?
     CellSide side = CellSide::UNKNOWN; //was a NS or a EW wall hit?
     while (hit == 0) {
         //jump to next map square, either in x-direction, or in y-direction

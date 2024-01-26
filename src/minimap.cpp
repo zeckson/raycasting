@@ -54,17 +54,18 @@ void Minimap::drawPlayer(SDL_Renderer *pRenderer) const {
     // Render plane
     //calculate ray position and direction
     SDL_SetRenderColorRGB(pRenderer, GREEN);
-    double rayDirX = player.getRayDirX(0);
-    double rayDirY = player.getRayDirY(0);
+    double rayDirX = player.getRayDirX(-1);
+    double rayDirY = player.getRayDirY(-1);
     directionX = translateX(player.posX + rayDirX);
     directionY = translateY(player.posY + rayDirY);
     SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
 
-    rayDirX = player.getRayDirX(2 * width / (double) width - 1);
-    rayDirY = player.getRayDirY(2 * width / (double) width - 1);
+    rayDirX = player.getRayDirX(1);
+    rayDirY = player.getRayDirY(1);
     directionX = translateX(player.posX + rayDirX);
     directionY = translateY(player.posY + rayDirY);
     SDL_RenderDrawLine(pRenderer, playerX, playerY, directionX, directionY);
+
 }
 
 void Minimap::drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) {
