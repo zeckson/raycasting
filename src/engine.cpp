@@ -3,7 +3,6 @@
 //
 
 #include "engine.h"
-#include "player.h"
 #include "map.h"
 #include "color.h"
 #include "cmath"
