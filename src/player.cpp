@@ -23,10 +23,10 @@ void Player::onKeyDown(const SDL_Keysym &key) {
             move = -moveSpeed;
             break;
         case SDL_SCANCODE_LEFT:
-            rotate = rotSpeed;
+            rotate = -rotSpeed;
             break;
         case SDL_SCANCODE_RIGHT:
-            rotate = -rotSpeed;
+            rotate = rotSpeed;
             break;
         default:
             // do nothing
@@ -60,7 +60,7 @@ Player::Player(double posX, double posY, double yawRad): posX(posX), posY(posY) 
     dirX = cos(yawRad);
     dirY = sin(yawRad);
     //the 2d raycaster version of camera plane
-    planeX = PLANE_X_RADIUS * cos(yawRad - M_PI_2);
-    planeY = PLANE_X_RADIUS * sin(yawRad - M_PI_2);
+    planeX = PLANE_X_RADIUS * cos(yawRad + M_PI_2);
+    planeY = PLANE_X_RADIUS * sin(yawRad + M_PI_2);
 }
 
