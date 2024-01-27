@@ -37,6 +37,10 @@ public:
     TextureMap() {
         generate();
     }
+
+    std::vector<size_t>& operator[](int index) {
+        return textures[index];
+    }
 };
 
 

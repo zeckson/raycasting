@@ -6,11 +6,18 @@
 #include "map.h"
 #include "color.h"
 #include "cmath"
+#include "util.h"
 
 void Engine::render(SDL_Renderer *renderer) {
     for (int x = 0; x < width; x++) {
-        Intersection intersection = trace(x);
+        double cameraX = 2 * x / (double) width - 1; //x-coordinate in camera space
+
+        Intersection intersection = trace(cameraX);
         double perpWallDist = intersection.distance;
+
+        int mapX = intersection.x;
+        int mapY = intersection.y;
+        const CellSide side = intersection.side;
 
         //Calculate height of line to draw on screen
         int lineHeight = (int) (height / perpWallDist);
@@ -20,36 +27,77 @@ void Engine::render(SDL_Renderer *renderer) {
         if (drawStart < 0) drawStart = 0;
         int drawEnd = lineHeight / 2 + height / 2;
         if (drawEnd >= height) drawEnd = height - 1;
+//        drawTexture(renderer, x, cameraX, perpWallDist, mapX, mapY, side, lineHeight, drawStart, drawEnd);
 
-        int mapX = intersection.x;
-        int mapY = intersection.y;
-
-        //choose wall color
-        ColorRGB color = colorMap[worldMap[mapX][mapY]];
-
-        //give x and y sides different brightness
-        if (intersection.side == CellSide::NORTH || intersection.side == CellSide::SOUTH) {
-            color = color / 2;
-        }
-
-        // ...shade by distance...
-        double distanceShade = 1.0 - std::fmin(intersection.distance / 24.0, 1.0);
-        color = color * distanceShade;
-
-        SDL_SetRenderColorRGB(renderer, color);
-        // Draw the column
-        //draw the pixels of the stripe as a vertical line
-        SDL_RenderDrawLine(renderer, x, drawStart, x, drawEnd);
+        drawColor(renderer, x, intersection, drawStart, drawEnd);
     }
+}
+
+void Engine::drawTexture(SDL_Renderer *renderer, int x, double cameraX, double perpWallDist, int mapX, int mapY,
+                         const CellSide &side, int lineHeight, int drawStart, int drawEnd) {//calculate value of wallX
+    double wallX; //where exactly the wall was hit
+    bool leftRight = side == CellSide::WEST || side == CellSide::EAST;
+    if (leftRight) {
+        wallX = player.posY + perpWallDist * player.getRayDirY(cameraX);
+    } else {
+        wallX = player.posX + perpWallDist * player.getRayDirX(cameraX);
+    }
+    wallX -= floor(wallX);
+
+    //x coordinate on the texture
+    int texX = int(wallX * double(texWidth));
+    if(side == CellSide::WEST) texX = texWidth - texX - 1;
+    if(side == CellSide::NORTH) texX = texWidth - texX - 1;
+
+    int texNum = worldMap[mapX][mapY] - 1; //1 subtracted from it so that texture 0 can be used!
+// TODO: an integer-only bresenham or DDA like algorithm could make the texture coordinate stepping faster
+// How much to increase the texture coordinate per screen pixel
+    double step = 1.0 * texHeight / lineHeight;
+    // Starting texture coordinate
+    double texPos = (drawStart - height / 2 + lineHeight / 2) * step;
+    for(int y = drawStart; y < drawEnd; y++)
+    {
+        // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+        int texY = (int)texPos & (texHeight - 1);
+        texPos += step;
+        const auto map = textureMap[texNum];
+        u_int32_t color = map[texHeight * texY + texX];
+        //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+        if(leftRight) color = (color >> 1) & 8355711;
+        SDL_SetRenderPixel(renderer, x, y, color);
+    }
+}
+
+void Engine::drawColor(SDL_Renderer *renderer, int x, const Intersection &intersection, int drawStart,
+                  int drawEnd) const {
+    int mapX = intersection.x;
+    int mapY = intersection.y;
+
+    const CellSide side = intersection.side;
+
+    //choose wall color
+    const int wallType = worldMap[mapX][mapY];
+
+    ColorRGB color = colorMap[wallType];
+    //give x and y sides different brightness
+    if (side == CellSide::NORTH || side == CellSide::SOUTH) {
+        color = color / 2;
+    }
+
+    // ...shade by distance...
+    double distanceShade = 1.0 - fmin(intersection.distance / 24.0, 1.0);
+    color = color * distanceShade;
+
+    SDL_SetRenderColorRGB(renderer, color);
+    // Draw the column
+//draw the pixels of the stripe as a vertical line
+    SDL_RenderDrawLine(renderer, x, drawStart, x, drawEnd);
 }
 
 Intersection Engine::trace(double x) {
     //calculate ray position and direction
-    double cameraX = 2 * x / (double) width - 1; //x-coordinate in camera space
-
-    //calculate ray position and direction
-    double rayDirX = player.getRayDirX(cameraX);
-    double rayDirY = player.getRayDirY(cameraX);
+    double rayDirX = player.getRayDirX(x);
+    double rayDirY = player.getRayDirY(x);
 
     //length of ray from current position to next x or y-side
     double sideDistX;

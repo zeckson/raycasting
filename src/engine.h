@@ -27,17 +27,26 @@ struct Intersection {
 
 class Engine {
 private:
-    const TextureMap textureMap;
+    TextureMap textureMap;
 
-    const Player& player;
+    const Player &player;
     const uint16_t width, height;
 
     Intersection trace(double cameraX);
 
 public:
-    explicit Engine(const Player& player, uint16_t width, uint16_t height) : player(player), width(width), height(height) {};
+    explicit Engine(const Player &player, uint16_t width, uint16_t height) : player(player), width(width),
+                                                                             height(height) {};
 
     void render(SDL_Renderer *renderer);
+
+    void drawColor(SDL_Renderer *renderer, int x,
+                   const Intersection &intersection,
+                   int drawStart,
+                   int drawEnd) const;
+
+    void drawTexture(SDL_Renderer *renderer, int x, double cameraX, double perpWallDist, int mapX, int mapY,
+                     const CellSide &side, int lineHeight, int drawStart, int drawEnd);
 };
 
 
