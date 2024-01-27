@@ -7,6 +7,9 @@
 #include "color.h"
 #include "cmath"
 #include "util.h"
+#include "const.h"
+
+Uint32 buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
 void Engine::render(SDL_Renderer *renderer) {
     for (int x = 0; x < width; x++) {
@@ -27,10 +30,12 @@ void Engine::render(SDL_Renderer *renderer) {
         if (drawStart < 0) drawStart = 0;
         int drawEnd = lineHeight / 2 + height / 2;
         if (drawEnd >= height) drawEnd = height - 1;
-//        drawTexture(renderer, x, cameraX, perpWallDist, mapX, mapY, side, lineHeight, drawStart, drawEnd);
+        drawTexture(renderer, x, cameraX, perpWallDist, mapX, mapY, side, lineHeight, drawStart, drawEnd);
 
-        drawColor(renderer, x, intersection, drawStart, drawEnd);
+//        drawColor(renderer, x, intersection, drawStart, drawEnd);
     }
+
+    drawBuffer(renderer);
 }
 
 void Engine::drawTexture(SDL_Renderer *renderer, int x, double cameraX, double perpWallDist, int mapX, int mapY,
@@ -50,8 +55,8 @@ void Engine::drawTexture(SDL_Renderer *renderer, int x, double cameraX, double p
     if(side == CellSide::NORTH) texX = texWidth - texX - 1;
 
     int texNum = worldMap[mapX][mapY] - 1; //1 subtracted from it so that texture 0 can be used!
-// TODO: an integer-only bresenham or DDA like algorithm could make the texture coordinate stepping faster
-// How much to increase the texture coordinate per screen pixel
+    // TODO: an integer-only bresenham or DDA like algorithm could make the texture coordinate stepping faster
+    // How much to increase the texture coordinate per screen pixel
     double step = 1.0 * texHeight / lineHeight;
     // Starting texture coordinate
     double texPos = (drawStart - height / 2 + lineHeight / 2) * step;
@@ -64,7 +69,7 @@ void Engine::drawTexture(SDL_Renderer *renderer, int x, double cameraX, double p
         u_int32_t color = map[texHeight * texY + texX];
         //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
         if(leftRight) color = (color >> 1) & 8355711;
-        SDL_SetRenderPixel(renderer, x, y, color);
+        buffer[y][x] = color;
     }
 }
 
@@ -170,4 +175,16 @@ Intersection Engine::trace(double x) {
     else perpWallDist = (sideDistY - deltaDistY);
 
     return {mapX, mapY, perpWallDist, side};
+}
+
+void Engine::drawBuffer(SDL_Renderer *renderer) const {
+    SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, width, height);
+    if (texture == nullptr) {
+        printf("Failed to create texture: %s\n", SDL_GetError());
+    }
+
+    // Update the texture with pixel data
+    SDL_UpdateTexture(texture, nullptr, buffer, width * sizeof(Uint32));
+
+    SDL_RenderCopy(renderer, texture, nullptr, nullptr);
 }

@@ -13,7 +13,7 @@ int main() {
 
     SDL_Window *window = SDL_CreateWindow("Raycasting Example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                                           screenWidth, screenHeight, SDL_WINDOW_SHOWN);
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_GL_DOUBLEBUFFER);
 
     Player player(PLAYER_X, PLAYER_Y, PLAYER_YAW);
     Engine engine(player, screenWidth, screenHeight);
