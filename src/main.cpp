@@ -64,6 +64,7 @@ int main() {
                                "Keydown code: %u", keysym.scancode);
 
                 player.onKeyDown(keysym);
+                minimap.onKeyDown(keysym);
             }
         }
     }

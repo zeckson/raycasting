@@ -8,18 +8,22 @@
 
 #include <SDL_render.h>
 #include "player.h"
+#include "keyhandler.h"
 
 #define GRID_SIZE 20
 
-class Minimap {
+class Minimap: KeyHandler {
 public:
     explicit Minimap(const Player &player, int width, int height);
 
     void render(SDL_Renderer *pRenderer);
 
+    void onKeyDown(const SDL_Keysym &key) override;
+    void onKeyUp(const SDL_Keysym &key) override;
 private:
     const Player& player;
     int width, height, size = GRID_SIZE;
+    bool shown = false;
 
     static void drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) ;
 
@@ -30,6 +34,7 @@ private:
 
     [[nodiscard]] int translateY(int y) const;
     [[nodiscard]] int translateY(double y) const;
+
 };
 
 

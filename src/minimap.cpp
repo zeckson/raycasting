@@ -9,6 +9,7 @@
 Minimap::Minimap(const Player &player, int width, int height) : player(player), width(width), height(height) {}
 
 void Minimap::render(SDL_Renderer *pRenderer) {
+    if (!shown) return;
     SDL_Rect rect;
     for (int x = 0; x < mapWidth; ++x) {
         for (int y = 0; y < mapHeight; ++y) {
@@ -76,5 +77,16 @@ void Minimap::drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int 
             }
         }
     }
+}
+
+void Minimap::onKeyDown(const SDL_Keysym &key) {
+    if (key.sym == SDLK_TAB) {
+        shown = !shown;
+    }
+
+}
+
+void Minimap::onKeyUp(const SDL_Keysym &key) {
+
 }
 
