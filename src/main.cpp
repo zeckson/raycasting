@@ -1,13 +1,12 @@
 #include <SDL.h>
-#include <algorithm>
+#include "const.h"
 #include "map.h"
-#include "color.h"
 #include "player.h"
 #include "engine.h"
 #include "minimap.h"
 
-const int screenWidth = 800;
-const int screenHeight = 600;
+const int screenWidth = SCREEN_WIDTH;
+const int screenHeight = SCREEN_HEIGHT;
 
 int main() {
     SDL_Init(SDL_INIT_VIDEO);

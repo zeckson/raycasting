@@ -10,7 +10,7 @@
 #include "player.h"
 #include "keyhandler.h"
 
-#define GRID_SIZE 20
+const short sizes[] = {2, 4, 8, 12, 20};
 
 class Minimap: KeyHandler {
 public:
@@ -22,7 +22,8 @@ public:
     void onKeyUp(const SDL_Keysym &key) override;
 private:
     const Player& player;
-    int width, height, size = GRID_SIZE;
+    short zoom = 3;
+    int width, height, cellSize = sizes[zoom];
     bool shown = false;
 
     static void drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) ;

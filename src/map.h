@@ -6,10 +6,10 @@
 #define RAYCASTING_MAP_H
 
 
-#define mapWidth 24
-#define mapHeight 24
+#define MAP_WIDTH 24
+#define MAP_HEIGHT 24
 
-static int worldMap[mapWidth][mapHeight] =
+static int worldMap[MAP_WIDTH][MAP_HEIGHT] =
         {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
                 {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
