@@ -15,7 +15,7 @@ int main() {
                                           screenWidth, screenHeight, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    Player player;
+    Player player(PLAYER_X, PLAYER_Y, PLAYER_YAW);
     Engine engine(player, screenWidth, screenHeight);
     Minimap minimap(player, screenWidth, screenHeight);
 

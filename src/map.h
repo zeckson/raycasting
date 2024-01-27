@@ -9,6 +9,10 @@
 #define MAP_WIDTH 24
 #define MAP_HEIGHT 24
 
+#define PLAYER_Y 12
+#define PLAYER_X 22
+#define PLAYER_YAW M_PI
+
 static int worldMap[MAP_WIDTH][MAP_HEIGHT] =
         {
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},

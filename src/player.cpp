@@ -55,3 +55,12 @@ void Player::onKeyDown(const SDL_Keysym &key) {
 
 }
 
+Player::Player(double posX, double posY, double yawRad): posX(posX), posY(posY) {
+    //initial direction vector
+    dirX = cos(yawRad);
+    dirY = sin(yawRad);
+    //the 2d raycaster version of camera plane
+    planeX = PLANE_X_RADIUS * cos(yawRad - M_PI_2);
+    planeY = PLANE_X_RADIUS * sin(yawRad - M_PI_2);
+}
+
