@@ -30,16 +30,16 @@ void Engine::render(SDL_Renderer *renderer) {
         if (drawStart < 0) drawStart = 0;
         int drawEnd = lineHeight / 2 + height / 2;
         if (drawEnd >= height) drawEnd = height - 1;
-        drawTexture(renderer, x, cameraX, perpWallDist, mapX, mapY, side, lineHeight, drawStart, drawEnd);
+//        drawTexture(x, cameraX, perpWallDist, mapX, mapY, side, lineHeight, drawStart, drawEnd);
 
-//        drawColor(renderer, x, intersection, drawStart, drawEnd);
+        drawColor(renderer, x, intersection, drawStart, drawEnd);
     }
 
-    drawBuffer(renderer);
+//    drawBuffer(renderer);
 }
 
-void Engine::drawTexture(SDL_Renderer *renderer, int x, double cameraX, double perpWallDist, int mapX, int mapY,
-                         const CellSide &side, int lineHeight, int drawStart, int drawEnd) {//calculate value of wallX
+void Engine::drawTexture(int x, double cameraX, double perpWallDist, int mapX, int mapY, const CellSide &side,
+                         int lineHeight, int drawStart, int drawEnd) {//calculate value of wallX
     double wallX; //where exactly the wall was hit
     bool leftRight = side == CellSide::WEST || side == CellSide::EAST;
     if (leftRight) {
@@ -73,7 +73,7 @@ void Engine::drawTexture(SDL_Renderer *renderer, int x, double cameraX, double p
     }
 }
 
-void Engine::drawColor(SDL_Renderer *renderer, int x, const Intersection &intersection, int drawStart,
+[[maybe_unused]] void Engine::drawColor(SDL_Renderer *renderer, int x, const Intersection &intersection, int drawStart,
                   int drawEnd) const {
     int mapX = intersection.x;
     int mapY = intersection.y;
@@ -95,7 +95,7 @@ void Engine::drawColor(SDL_Renderer *renderer, int x, const Intersection &inters
 
     SDL_SetRenderColorRGB(renderer, color);
     // Draw the column
-//draw the pixels of the stripe as a vertical line
+    //draw the pixels of the stripe as a vertical line
     SDL_RenderDrawLine(renderer, x, drawStart, x, drawEnd);
 }
 
@@ -178,7 +178,7 @@ Intersection Engine::trace(double x) {
 }
 
 void Engine::drawBuffer(SDL_Renderer *renderer) const {
-    SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STATIC, width, height);
+    SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
     if (texture == nullptr) {
         printf("Failed to create texture: %s\n", SDL_GetError());
     }
