@@ -41,7 +41,5 @@ static int worldMap[MAP_WIDTH][MAP_HEIGHT] =
                 {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
         };
 
-static double frameTime = 0;
-
 
 #endif //RAYCASTING_MAP_H

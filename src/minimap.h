@@ -8,7 +8,7 @@
 
 #include <SDL_render.h>
 #include "player.h"
-#include "keyhandler.h"
+#include "base/keyhandler.h"
 
 const short sizes[] = {2, 4, 8, 12, 20};
 

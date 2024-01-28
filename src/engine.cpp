@@ -6,7 +6,6 @@
 #include "map.h"
 #include "color.h"
 #include "cmath"
-#include "util.h"
 #include "const.h"
 
 Uint32 buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
@@ -83,7 +82,7 @@ void Engine::drawTexture(int x, double cameraX, double perpWallDist, int mapX, i
     //choose wall color
     const int wallType = worldMap[mapX][mapY];
 
-    ColorRGB color = colorMap[wallType];
+    Pixel color = colorMap[wallType];
     //give x and y sides different brightness
     if (side == CellSide::NORTH || side == CellSide::SOUTH) {
         color = color / 2;
