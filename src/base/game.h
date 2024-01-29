@@ -25,6 +25,7 @@ protected:
 private:
     SDL_Window *window;
 
+    bool input(SDL_Event &e);
 };
 
 
