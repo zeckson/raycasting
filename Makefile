@@ -1,8 +1,8 @@
 SRC_DIR = src
 BUILD_DIR = build
 CC = g++
-SRC_FILES = $(wildcard $(SRC_DIR)/*.cpp) $(wildcard $(SRC_DIR)/**/*.cpp)
-HEADER_FILES = $(wildcard $(SRC_DIR)/*.h) $(wildcard $(SRC_DIR)/**/*.h)
+SRC_FILES = $(wildcard $(SRC_DIR)/**/*.cpp) $(wildcard $(SRC_DIR)/**/**/*.cpp) $(wildcard $(SRC_DIR)/*.cpp)
+HEADER_FILES = $(wildcard $(SRC_DIR)/**/*.h) $(wildcard $(SRC_DIR)/*.h)
 OBJ_NAME = Raycasting
 SDL_LIBRARY_INCLUDE = $(shell pkg-config SDL2 --cflags)
 SDL_CORE_LIBRARY = $(shell pkg-config SDL2 --libs)

@@ -8,6 +8,7 @@
 #include "player.h"
 #include "texturemap.h"
 #include "SDL.h"
+#include "base/renderer/pixelrenderer.h"
 
 enum class CellSide {
     EAST = 0,
@@ -31,7 +32,7 @@ public:
                                                                              height(height) {
     };
 
-    void render(SDL_Renderer *renderer);
+    void render(PixelRenderer *renderer);
 
 private:
     TextureMap textureMap;
@@ -41,10 +42,10 @@ private:
 
     Intersection trace(double cameraX);
 
-    [[maybe_unused]] void drawColor(SDL_Renderer *renderer, int x,
-                   const Intersection &intersection,
-                   int drawStart,
-                   int drawEnd) const;
+    [[maybe_unused]] void drawColor(PixelRenderer *renderer, int x,
+                                    const Intersection &intersection,
+                                    int drawStart,
+                                    int drawEnd) const;
 
     void drawTexture(int x, double cameraX, double perpWallDist, int mapX, int mapY, const CellSide &side,
                      int lineHeight, int drawStart, int drawEnd);

@@ -9,6 +9,7 @@
 #include <SDL_render.h>
 #include "player.h"
 #include "base/keyhandler.h"
+#include "base/renderer/pixelrenderer.h"
 
 const short sizes[] = {2, 4, 8, 12, 20};
 
@@ -16,7 +17,7 @@ class Minimap: KeyHandler {
 public:
     explicit Minimap(const Player &player, int width, int height);
 
-    void render(SDL_Renderer *pRenderer);
+    void render(PixelRenderer *pRenderer);
 
     void onKeyDown(const SDL_Keysym &key) override;
     void onKeyUp(const SDL_Keysym &key) override;
@@ -26,9 +27,7 @@ private:
     int width, height, cellSize = sizes[zoom];
     bool shown = false;
 
-    static void drawCircle(SDL_Renderer *pRenderer, int centerX, int centerY, int radius) ;
-
-    void drawPlayer(SDL_Renderer *pRenderer) const;
+    void drawPlayer(PixelRenderer *pRenderer) const;
 
     [[nodiscard]] int translateX(int x) const;
     [[nodiscard]] int translateX(double x) const;

@@ -7,15 +7,15 @@
 
 class FPSGame: public Game {
 public:
-    FPSGame(): Game("Raycasting Example", SCREEN_WIDTH, SCREEN_HEIGHT) {}
+    FPSGame(): Game("Raycasting 3D Game", SCREEN_WIDTH, SCREEN_HEIGHT) {}
 
     bool onGameCreate() override {
         return true;
     }
 
     bool onGameUpdate(double elapsedTime) override {
-        engine.render(renderer);
-        minimap.render(renderer);
+        engine.render(renderer.get());
+        minimap.render(renderer.get());
         return true;
     }
 

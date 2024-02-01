@@ -6,6 +6,8 @@
 #define RAYCASTING_GAME_H
 
 #include <SDL.h>
+#include <memory>
+#include "renderer/pixelrenderer.h"
 
 class Game {
 public:
@@ -15,7 +17,7 @@ public:
 protected:
     explicit Game(const char *title, Uint16 width, Uint16 height);
 
-    SDL_Renderer *renderer;
+    std::unique_ptr<PixelRenderer> renderer;
 
     virtual bool onGameCreate() = 0;
 

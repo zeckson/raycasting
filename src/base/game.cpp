@@ -3,15 +3,37 @@
 //
 
 #include "game.h"
+#include <iostream>
 
-Game::Game(const char* title, Uint16 width, Uint16 height): width(width), height(height) {
-    SDL_Init(SDL_INIT_VIDEO);
+Game::Game(const char *title, Uint16 width, Uint16 height) : width(width), height(height) {
+    SDL_LogSetAllPriority(SDL_LOG_PRIORITY_WARN);
 
-    window = SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                          width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
-    SDL_Renderer *pSdlRenderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        std::cout << "SDL could not be initialized: " << SDL_GetError();
+    } else {
+        std::cout << "SDL video system is ready to go\n";
+    }
 
-    renderer = pSdlRenderer;
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
+
+    // Create an application window with the following settings:
+    window = SDL_CreateWindow(
+            title,        // window title
+            SDL_WINDOWPOS_CENTERED, // initial x position
+            SDL_WINDOWPOS_CENTERED, // initial y position
+            width,                     // width, in pixels
+            height,                     // height, in pixels
+            SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
+    );
+
+    // Check that the window was successfully created
+    if (!window) {
+        // In the case that the window could not be made...
+        printf("Failed to open %d x %d window: %s\n", width, height, SDL_GetError());
+        exit(1);
+    }
+
+    renderer = std::make_unique<PixelRenderer>(window, width, height);
 }
 
 void Game::start() {
@@ -26,12 +48,12 @@ void Game::start() {
     SDL_Event e;
     while (!quit) {
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
+        renderer->setColor(BLACK);
+        renderer->clear();
 
         onGameUpdate(frameTime);
 
-        SDL_RenderPresent(renderer);
+        renderer->present();
 
         //timing for input and FPS counter
         oldTime = time;
@@ -45,7 +67,7 @@ void Game::start() {
         quit = input(e);
     }
 
-    SDL_DestroyRenderer(renderer);
+    renderer->destroy();
     SDL_DestroyWindow(window);
     SDL_Quit();
 }

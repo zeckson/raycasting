@@ -4,13 +4,12 @@
 
 #include "engine.h"
 #include "map.h"
-#include "color.h"
 #include "cmath"
 #include "const.h"
 
 Uint32 buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
-void Engine::render(SDL_Renderer *renderer) {
+void Engine::render(PixelRenderer *renderer) {
     for (int x = 0; x < width; x++) {
         double cameraX = 2 * x / (double) width - 1; //x-coordinate in camera space
 
@@ -54,13 +53,11 @@ void Engine::drawTexture(int x, double cameraX, double perpWallDist, int mapX, i
     if(side == CellSide::NORTH) texX = texWidth - texX - 1;
 
     int texNum = worldMap[mapX][mapY] - 1; //1 subtracted from it so that texture 0 can be used!
-    // TODO: an integer-only bresenham or DDA like algorithm could make the texture coordinate stepping faster
     // How much to increase the texture coordinate per screen pixel
     double step = 1.0 * texHeight / lineHeight;
     // Starting texture coordinate
     double texPos = (drawStart - height / 2 + lineHeight / 2) * step;
-    for(int y = drawStart; y < drawEnd; y++)
-    {
+    for(int y = drawStart; y < drawEnd; y++) {
         // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
         int texY = (int)texPos & (texHeight - 1);
         texPos += step;
@@ -72,8 +69,8 @@ void Engine::drawTexture(int x, double cameraX, double perpWallDist, int mapX, i
     }
 }
 
-[[maybe_unused]] void Engine::drawColor(SDL_Renderer *renderer, int x, const Intersection &intersection, int drawStart,
-                  int drawEnd) const {
+[[maybe_unused]] void Engine::drawColor(PixelRenderer *renderer, int x, const Intersection &intersection, int drawStart,
+                                        int drawEnd) const {
     int mapX = intersection.x;
     int mapY = intersection.y;
 
@@ -92,10 +89,11 @@ void Engine::drawTexture(int x, double cameraX, double perpWallDist, int mapX, i
     double distanceShade = 1.0 - fmin(intersection.distance / 24.0, 1.0);
     color = color * distanceShade;
 
-    SDL_SetRenderColorRGB(renderer, color);
+    renderer->setColor(color);
+//    SDL_SetRenderColorRGB(renderer, color);
     // Draw the column
     //draw the pixels of the stripe as a vertical line
-    SDL_RenderDrawLine(renderer, x, drawStart, x, drawEnd);
+    renderer->drawLine(x, drawStart, x, drawEnd);
 }
 
 Intersection Engine::trace(double x) {
